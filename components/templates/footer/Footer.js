@@ -81,26 +81,26 @@ const Footer = async () => {
               اطلاعات تماس
             </h2>
 
-        {contacts.storePhone && (
+        {contacts?.storePhone && (
   <p>
     📞 تلفن فروشگاه:
     <a
-      href={`tel:${contacts.storePhone}`}
+      href={`tel:${contacts?.storePhone}`}
       className="mr-1 text-cyan-400 hover:underline"
     >
-      {contacts.storePhone}
+      {contacts?.storePhone}
     </a>
   </p>
 )}
 
-{contacts.mobilePhone && (
+{contacts?.mobilePhone && (
   <p>
     📱 موبایل:
     <a
-      href={`tel:${contacts.mobilePhone}`}
+      href={`tel:${contacts?.mobilePhone}`}
       className="mr-1 text-cyan-400 hover:underline"
     >
-      {contacts.mobilePhone}
+      {contacts?.mobilePhone}
     </a>
   </p>
 )}
@@ -112,16 +112,16 @@ const Footer = async () => {
                 </h3>
 
                 <div className='flex gap-4'>
-                  {socialLinks.map(social => (
+                  {socialLinks?.map(social => (
                     <a
-                      key={social._id}
-                      href={social.value}
+                      key={social?._id}
+                      href={social?.value}
                       target='_blank'
                       rel='noopener noreferrer'
-                      className={`w-11 h-11 flex items-center justify-center rounded-2xl text-white bg-gray-900 hover:bg-gray-800 border border-gray-700 transition ${social.color}`}
-                      aria-label={social.label}
+                      className={`w-11 h-11 flex items-center justify-center rounded-2xl text-white bg-gray-900 hover:bg-gray-800 border border-gray-700 transition ${social?.color}`}
+                      aria-label={social?.label}
                     >
-                      {social.icon}
+                      {social?.icon}
                     </a>
                   ))}
                 </div>
