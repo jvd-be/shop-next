@@ -8,16 +8,38 @@ import ProductModel from '@/model/ProductModel'
 import { getAuthFromCookies } from '@/components/utils/authServer'
 import Usermodel from '@/model/Usermodel'
 import Categorymodel from '@/model/Categorymodel'
-export default async function Products () {
+import Banners from '@/components/templates/banners/Banners'
+import { Getbanners } from '@/components/utils/helperServer'
+import Headermobile from '@/components/modules/headermobile/Headermobile'
+import GeneralModel from '@/model/GeneralModel'
+export default async function Products ({ searchParams }) {
   const auth = await getAuthFromCookies()
   let productsData = []
+  let totalProducts
   let userData = []
   let categoryiesData = []
+  let logoData = null
+  const banners = await Getbanners()
+  const params = await searchParams
+  const page = Math.max(1, params.page)
+  const limit = 8
+  const skip = (page - 1) * limit
   try {
     await ConnectToDB()
+    logoData = await GeneralModel.findOne(
+      {},
+      { siteLogo: 1, siteName: 1 }
+    ).lean()
+    productsData = await ProductModel.find({ isActive: true })
+      .sort({ totalQuantity: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('category')
+      .lean()
 
-    productsData = await ProductModel.find().populate('category').lean()
-    categoryiesData = await Categorymodel.find().lean()
+    totalProducts = await ProductModel.countDocuments()
+
+    categoryiesData = await Categorymodel.find({ isActive: true }).lean()
     if (auth?.isLoggedIn && auth?.user?.userId) {
       userData = await Usermodel.findById(auth.user.userId)
         .populate('wishlist')
@@ -29,12 +51,24 @@ export default async function Products () {
   const products = JSON.parse(JSON.stringify(productsData))
   const currentUser = JSON.parse(JSON.stringify(userData))
   const categories = JSON.parse(JSON.stringify(categoryiesData))
+  const totalPages = Math.ceil(totalProducts / limit)
+  const logo = JSON.parse(JSON.stringify(logoData))
+
 
   return (
-    <div>
+    <div className='dark:bg-gray-800'>
+
+      <Headermobile  logo={logo} banners={banners}  />
       <Navbar />
       <Menumobile />
-      <Productswrapper products={products} user={currentUser} categories={categories} />
+      <Productswrapper
+        products={products}
+        user={currentUser}
+        categories={categories}
+        totalProducts={totalProducts}
+        totalPages={totalPages}
+        currentPage={page}
+      />
       <Footer />
     </div>
   )

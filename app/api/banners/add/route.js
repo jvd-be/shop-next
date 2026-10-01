@@ -66,7 +66,8 @@ export async function POST(req) {
 
   try {
     const auth = await getAuthFromCookies()
-
+    console.log(auth.user);
+    
     if (!auth?.isLoggedIn) {
       return NextResponse.json(
         { message: 'ابتدا وارد حساب شوید' },
@@ -74,7 +75,7 @@ export async function POST(req) {
       )
     }
 
-    if (auth.user?.role !== 'ADMIN') {
+    if (auth.user?.role !== 'ADMIN' &&  auth.user?.role !== 'SUPER_ADMIN' ) {
       return NextResponse.json(
         { message: 'دسترسی غیر مجاز' },
         { status: 403 }

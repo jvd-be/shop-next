@@ -1,5 +1,5 @@
 'use client'
-import React, {  useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   FaSearch,
   FaUser,
@@ -11,13 +11,24 @@ import ToggleButton from '../../modules/toggleButton/ToggleButton'
 import Link from 'next/link'
 import { useCart } from '@/components/utils/CartContext'
 import Image from 'next/image'
+import Banners from '../banners/Banners'
+import { useHeight } from '@/components/utils/navHeightContext'
 
-function Navbarwrapper ({ auth, logo, initialproducts, initialblogs }) {
+function Navbarwrapper ({
+  auth,
+  logo,
+  initialproducts,
+  initialblogs,
+  categories,
+  banners
+}) {
   const [showSearchBar, setShowSearchBar] = useState(false)
   const [search, setSearch] = useState('')
   const { cartCount, mounted } = useCart()
   const [products, setProducts] = useState(initialproducts)
   const [blogs, setBlogs] = useState(initialblogs)
+  const { desktopNavRef } = useHeight()
+
   const filteredProducts = useMemo(() => {
     if (search.trim().length > 2) {
       return products.filter(
@@ -45,14 +56,47 @@ function Navbarwrapper ({ auth, logo, initialproducts, initialblogs }) {
     setSearch(e.target.value)
   }
 
+  const [showNavbar, setShowNavbar] = useState(true)
+  const lastScrollY = useRef(0)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      const fifthPage = window.innerHeight / 5
+
+      if (currentScrollY < lastScrollY.current) {
+        setShowNavbar(true)
+      } else if (
+        currentScrollY > lastScrollY.current &&
+        currentScrollY > fifthPage
+      ) {
+        setShowNavbar(false)
+      }
+
+      lastScrollY.current = currentScrollY
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
   return (
     <nav
-      className='hidden md:flex bg-white dark:bg-gray-900 
-                border-b border-gray-200 dark:border-gray-800
-                justify-center items-center 
-                shadow-sm dark:shadow-sm dark:shadow-black/70 
-                sticky top-0 z-50 '
+      ref={desktopNavRef}
+      className={`hidden md:flex fixed top-0 left-0 right-0
+      justify-center items-center
+      bg-white dark:bg-gray-900
+      border-b border-gray-200 dark:border-gray-800
+      shadow-sm z-50
+      flex-col
+      transition-transform duration-300
+      ${showNavbar ? 'translate-y-0' : '-translate-y-full'}
+    `}
     >
+      <Banners banners={banners} bannerKey='Top-banner' />
       <div className='grid grid-cols-12 gap-x-4 py-4 w-full max-w-7xl mx-auto px-4'>
         <div className='flex justify-center items-center font-yekan col-span-2'>
           <ToggleButton />
@@ -85,9 +129,7 @@ function Navbarwrapper ({ auth, logo, initialproducts, initialblogs }) {
             </Link>
           </li>
 
-          {/* آیتم ۲: محصولات (اصلاح شده) */}
           <li className='relative group'>
-            {/* این تگ a به صفحه محصولات می‌رود */}
             <Link
               href='/products'
               className='flex items-center gap-1 hover:text-amber-600 transition-all ease-in duration-150 cursor-pointer'
@@ -100,30 +142,19 @@ function Navbarwrapper ({ auth, logo, initialproducts, initialblogs }) {
               className='drop_down_menu absolute hidden dark:bg-gray-800 bg-gray-200 py-3 z-50 rounded-md group-hover:flex flex-col justify-center items-start w-full whitespace-nowrap min-w-50 space-y-1.5 shadow-lg transition-all ease-in duration-150 left-0'
               onClick={e => e.stopPropagation()}
             >
-              <Link
-                href={'/products/manteaus'}
-                className='px-4 py-2 hover:text-amber-600 hover:bg-gray-300 dark:hover:bg-gray-700 w-full block'
-              >
-                مانتو
-              </Link>
-              <Link
-                href={'/products/blouses'}
-                className='px-4 py-2 hover:text-amber-600 hover:bg-gray-300 dark:hover:bg-gray-700 w-full block'
-              >
-                بلوز و شومیز
-              </Link>
-              <Link
-                href={'/products/skirts'}
-                className='px-4 py-2 hover:text-amber-600 hover:bg-gray-300 dark:hover:bg-gray-700 w-full block'
-              >
-                دامن
-              </Link>
-              <Link
-                href={'/products/pants'}
-                className='px-4 py-2 hover:text-amber-600 hover:bg-gray-300 dark:hover:bg-gray-700 w-full block'
-              >
-                شلوار
-              </Link>
+              {categories.map(c => (
+                <Link
+                  key={c._id}
+                  href={
+                    c.parent
+                      ? `/category/${c.parent.slug}/${c.slug}`
+                      : `/category/${c.slug}`
+                  }
+                  className='px-4 py-2 hover:text-amber-600 hover:bg-gray-300 dark:hover:bg-gray-700 w-full block'
+                >
+                  {c.name}
+                </Link>
+              ))}
             </div>
           </li>
 
@@ -164,7 +195,7 @@ function Navbarwrapper ({ auth, logo, initialproducts, initialblogs }) {
             <FaSearch
               onClick={() => {
                 setShowSearchBar(!showSearchBar)
-                if (showSearchBar) setSearch('') // بستن سرچ = پاک کردن متن
+                if (showSearchBar) setSearch('')
               }}
               className='size-6 w-2/12 text-neutral-700 dark:text-white cursor-pointer hover:text-amber-600 transition-colors'
             />
@@ -214,7 +245,7 @@ function Navbarwrapper ({ auth, logo, initialproducts, initialblogs }) {
                         onClick={() => {
                           setSearch('')
                           setShowSearchBar(false)
-                        }} // پاکسازی بعد از کلیک
+                        }}
                         className='block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all'
                       >
                         <p className='text-sm font-medium text-neutral-800 dark:text-white'>
@@ -261,7 +292,7 @@ function Navbarwrapper ({ auth, logo, initialproducts, initialblogs }) {
             </Link>
           ) : (
             <Link
-              href={'/login'}
+              href={'/signup'}
               className='flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 transition-all ease-in duration-150 rounded-xl shadow-md hover:shadow-lg whitespace-nowrap'
             >
               <FaUser className='size-5' />

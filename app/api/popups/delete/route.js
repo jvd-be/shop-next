@@ -30,13 +30,13 @@ export async function DELETE(req) {
       )
     }
 
-    if (auth.user?.role !== 'ADMIN') {
+ 
+    if (auth.user?.role !== 'ADMIN' &&  auth.user?.role !== 'SUPER_ADMIN' ) {
       return NextResponse.json(
-        { success: false, message: 'دسترسی غیرمجاز' },
+        { message: 'دسترسی غیر مجاز' },
         { status: 403 }
       )
     }
-
     const contentType = req.headers.get('content-type') || ''
     let id = ''
 

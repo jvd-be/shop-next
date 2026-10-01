@@ -12,6 +12,7 @@ export default async function Adminproducstpage () {
     await ConnectToDB()
     categories = await Categorymodel.find({}).lean()
     let productsRow = await ProductModel.find({})
+      .sort({ createdAt: -1 })
       .populate('category', 'name')
       .lean()
     products = productsRow.map(item => ({
@@ -22,7 +23,7 @@ export default async function Adminproducstpage () {
     }))
   } catch (error) {}
   let initialproducts = JSON.parse(JSON.stringify(products))
-  let initialcategories=JSON.parse(JSON.stringify(categories))
+  let initialcategories = JSON.parse(JSON.stringify(categories))
   return (
     <Adminlayout>
       <Adminproductspagewrapper

@@ -1,13 +1,29 @@
 import { NextResponse } from "next/server"
 import ConnectToDB from "@/app/lib/mongodb"
 import Socialmodel from "@/model/Socialmodel"
+import { getAuthFromCookies } from "@/components/utils/authServer"
 
 export async function PUT(req) {
   try {
     await ConnectToDB()
+  const auth = await getAuthFromCookies()
 
+    if (!auth?.isLoggedIn) {
+      return NextResponse.json(
+        { message: "ابتدا وارد شوید" },
+        { status: 401 }
+      )
+    }
+
+   
+    if (auth.user?.role !== 'ADMIN' &&  auth.user?.role !== 'SUPER_ADMIN' ) {
+      return NextResponse.json(
+        { message: 'دسترسی غیر مجاز' },
+        { status: 403 }
+      )
+    }
     const body = await req.json()
-    console.log("BODY:", body)
+
 
     const { data } = body
 

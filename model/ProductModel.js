@@ -16,13 +16,13 @@ const ProductSchema = new mongoose.Schema(
       required: true
     },
 
-    // ✅ ادمین فقط اینو وارد می‌کند
+    
     price: { type: Number, required: true, min: 0 },
 
-    // ✅ ادمین فقط اینو وارد می‌کند
+  
     discount: { type: Number, default: 0, min: 0, max: 100 },
 
-    // ✅ سیستم خودش محاسبه می‌کند
+  
     finalPrice: { type: Number, min: 0 },
 
     totalQuantity: { type: Number, default: 0, min: 0 },

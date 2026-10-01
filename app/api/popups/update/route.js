@@ -92,13 +92,13 @@ export async function PUT(req) {
       )
     }
 
-    if (auth.user?.role !== "ADMIN") {
+
+    if (auth.user?.role !== 'ADMIN' &&  auth.user?.role !== 'SUPER_ADMIN' ) {
       return NextResponse.json(
-        { message: "دسترسی غیرمجاز" },
+        { message: 'دسترسی غیر مجاز' },
         { status: 403 }
       )
     }
-
     const formData = await req.formData()
     const id = formData.get("_id")?.toString().trim()
 

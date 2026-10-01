@@ -198,15 +198,15 @@ export default function Tabbanners ({
       <div className='space-y-3'>
         {banners.map(banner => (
           <div
-            key={banner._id}
+            key={banner?._id}
             className='flex items-center justify-between border rounded-lg p-4 bg-white dark:bg-gray-800 dark:text-gray-100'
           >
             <div>
-              <h3 className='font-semibold dark:text-white'>{banner.title}</h3>
+              <h3 className='font-semibold dark:text-white'>{banner?.title}</h3>
 
               <p className='text-sm text-gray-500'>
-                variant: {banner.variant} |{' '}
-                <Statusbadge status={banner.isActive ? 'فعال' : 'غیرفعال'} />
+                variant: {banner?.variant} |{' '}
+                <Statusbadge status={banner?.isActive ? 'فعال' : 'غیرفعال'} />
               </p>
             </div>
 
@@ -219,7 +219,7 @@ export default function Tabbanners ({
               </button>
 
               <button
-                onClick={() => openDelete(banner._id)}
+                onClick={() => openDelete(banner?._id)}
                 className='text-red-500'
               >
                 <FaTrash />

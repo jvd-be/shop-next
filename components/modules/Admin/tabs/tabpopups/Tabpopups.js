@@ -186,7 +186,9 @@ export default function Tabpopups ({
         onConfirm={onDelete}
       />
       <div className='flex items-center justify-between'>
-        <h2 className='text-xl font-semibold  dark:text-gray-100'>مدیریت پاپ‌آپ‌ها</h2>
+        <h2 className='text-xl font-semibold  dark:text-gray-100'>
+          مدیریت پاپ‌آپ‌ها
+        </h2>
 
         <button
           onClick={() => {
@@ -490,7 +492,9 @@ export default function Tabpopups ({
               />
 
               {/* dates */}
+
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <p>تاریخ شروع</p>
                 <input
                   type='datetime-local'
                   name='startDate'
@@ -498,7 +502,7 @@ export default function Tabpopups ({
                   onChange={handleChange}
                   className='w-full p-2 border rounded-lg'
                 />
-
+                <p>تاریخ اتمام</p>
                 <input
                   type='datetime-local'
                   name='endDate'

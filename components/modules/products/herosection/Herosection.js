@@ -1,8 +1,13 @@
 import React from 'react'
 
-export default function Herosection () {
+export default function Herosection ({ marginT }) {
+  console.log(marginT);
+  
   return (
-    <div className='relative bg-linear-to-br from-indigo-600 via-purple-600 to-indigo-800 dark:from-indigo-900 dark:via-purple-900 dark:to-indigo-950 text-white py-20 px-4 sm:px-6 lg:px-8 overflow-hidden'>
+    <div
+      style={{ marginTop: `${marginT}px` }}
+      className='relative bg-linear-to-br  from-indigo-600 via-purple-600 to-indigo-800 dark:from-indigo-900 dark:via-purple-900 dark:to-indigo-950 text-white py-30 px-4 sm:px-6 lg:px-8 overflow-hidden'
+    >
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
       <div className='absolute -top-24 -left-24 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob'></div>
       <div className='absolute -bottom-24 -right-24 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000'></div>

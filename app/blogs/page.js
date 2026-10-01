@@ -5,6 +5,8 @@ import Navbar from '@/components/templates/navbar/Navbar'
 import Blogmodel from '@/model/Blogmodel'
 import ConnectToDB from '../lib/mongodb'
 import Headermobile from '@/components/modules/headermobile/Headermobile'
+import { Getbanners } from '@/components/utils/helperServer'
+import GeneralModel from '@/model/GeneralModel'
 export const metadata = {
   title: 'وبلاگ مد و لباس | جدیدترین ترندها و استایل‌ها',
   description:
@@ -40,6 +42,18 @@ export default async function Blogs () {
     url: 'https://yourdomain.com/blogs'
   }
 
+  let logoData = null
+  try {
+    logoData = await GeneralModel.findOne(
+      {},
+      { siteLogo: 1, siteName: 1 }
+    ).lean()
+  } catch (error) {}
+  const logo = JSON.parse(JSON.stringify(logoData))
+const bannersData = await Getbanners()
+const banners = bannersData ?? []
+
+
   return (
     <>
       <script
@@ -47,7 +61,8 @@ export default async function Blogs () {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Navbar />
-      <Headermobile/>
+
+      <Headermobile logo={logo} banners={banners} />
       <Menumobile />
       <header className='sr-only'>
         <h1>وبلاگ مد و لباس و راهنمای استایل فشن</h1>

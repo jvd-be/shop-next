@@ -1,8 +1,8 @@
 'use client'
-import { useRef, useState, useMemo, useEffect, useEffectEvent } from 'react'
 
+import { useRef, useState, useMemo, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Herosection from '@/components/modules/products/herosection/Herosection'
-import Category from '@/components/modules/products/category/Category'
 import Productcard from '@/components/modules/productcard/Productcard'
 import Sortdropdown from '@/components/modules/products/sortdropdown/Sortdropdown'
 import Filters from '@/components/modules/products/filters/Filters'
@@ -11,26 +11,33 @@ import { UseNotification } from '@/components/hooks/UseNotification'
 import Cardnotification from '@/components/modules/cardnotification/Cardnotification'
 import { FiCheck } from 'react-icons/fi'
 import { HiOutlineExclamation } from 'react-icons/hi'
-import UsePagination from '@/components/hooks/UsePagination'
-import Pagenationadminproduct from '@/components/modules/Admin/pagenationadminproduct/Pagenationadminproduct'
 import Filterdrawer from '@/components/modules/products/filterdrawer/Filterdrawer'
-import { useSearchParams } from 'next/navigation'
+import Pagenationbackendproduct from '@/components/modules/Admin/pagenationbackendproduct/pagenationBackendproduct'
+import { useDevice } from '@/components/utils/helper'
+import { useHeight } from '@/components/utils/navHeightContext'
 
 export default function Productswrapper ({
   products = [],
   user,
-  categories = []
+  categories = [],
+  totalProducts = 0,
+  totalPages = 1
 }) {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [sortBy, setSortBy] = useState('default')
+
   const searchParams = useSearchParams()
+
+  const productSectionRef = useRef(null)
+
+  const currentPage = Math.max(1, Number(searchParams.get('page')) || 1)
 
   useEffect(() => {
     const sortFromUrl = searchParams.get('sort')
-     if (sortFromUrl) {
-      setSortBy(sortFromUrl)
-    }
+
+    setSortBy(sortFromUrl || 'default')
   }, [searchParams])
+
   const [filters, setFilters] = useState({
     minPrice: '',
     maxPrice: '',
@@ -41,8 +48,26 @@ export default function Productswrapper ({
     materials: [],
     onSale: false
   })
+
+  useEffect(() => {
+    const filterFromUrl = searchParams.get('category')
+
+    if (filterFromUrl) {
+      setFilters(prev => ({
+        ...prev,
+        categories: [filterFromUrl]
+      }))
+    } else {
+      setFilters(prev => ({
+        ...prev,
+        categories: []
+      }))
+    }
+  }, [searchParams])
+
   const initialWishlistIds = useMemo(() => {
     const list = user?.wishlist || []
+
     return list.map(item =>
       typeof item === 'string' ? item : String(item._id)
     )
@@ -65,7 +90,9 @@ export default function Productswrapper ({
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ productId: normalizedId })
+        body: JSON.stringify({
+          productId: normalizedId
+        })
       })
 
       if (response.ok) {
@@ -89,30 +116,29 @@ export default function Productswrapper ({
   const sortedAndFilteredProduct = useMemo(() => {
     let currentProducts = [...(products || [])]
 
-    // فیلتر قیمت
     if (filters.minPrice) {
       currentProducts = currentProducts.filter(
         p => Number(p.price) >= Number(filters.minPrice)
       )
     }
+
     if (filters.maxPrice) {
       currentProducts = currentProducts.filter(
         p => Number(p.price) <= Number(filters.maxPrice)
       )
     }
 
-    // فیلتر دسته‌بندی
     if (filters.categories.length > 0) {
       currentProducts = currentProducts.filter(product => {
         const catId =
           typeof product.category === 'string'
             ? product.category
-            : product.category?._id
+            : product.category?.slug
+
         return filters.categories.includes(String(catId))
       })
     }
 
-    // فیلتر سایز (از variants)
     if (filters.sizes.length > 0) {
       currentProducts = currentProducts.filter(product =>
         product.variants?.some(variant => filters.sizes.includes(variant.size))
@@ -122,29 +148,25 @@ export default function Productswrapper ({
     if (filters.colors.length > 0) {
       currentProducts = currentProducts.filter(product =>
         product.variants?.some(variant =>
-          filters.colors.includes(variant.color)
+          filters.colors.includes(variant.colorName)
         )
       )
     }
 
-    // جنسیت
     if (filters.gender) {
       currentProducts = currentProducts.filter(p => p.gender === filters.gender)
     }
 
-    // جنس پارچه
     if (filters.materials.length > 0) {
       currentProducts = currentProducts.filter(p =>
         filters.materials.includes(p.material)
       )
     }
 
-    // فقط تخفیف‌دار
     if (filters.onSale) {
       currentProducts = currentProducts.filter(p => Number(p.discount) > 0)
     }
 
-    // مرتب‌سازی
     if (sortBy === 'price-asc') {
       currentProducts.sort((a, b) => Number(a.price) - Number(b.price))
     } else if (sortBy === 'price-desc') {
@@ -162,66 +184,68 @@ export default function Productswrapper ({
     return currentProducts
   }, [products, filters, sortBy])
 
-  const {
-    currentPage,
-    setCurrentPage,
-    totalPages,
-    totalItems,
-    indexOfFirstItem,
-    indexOfLastItem,
-    currentItems
-  } = UsePagination(sortedAndFilteredProduct, 8)
-
   useEffect(() => {
-    setCurrentPage(1)
-  }, [filters, sortBy, setCurrentPage])
-
-  const productSectionRef = useRef(null)
-  const prevPageRef = useRef(currentPage)
-
-  useEffect(() => {
-    if (prevPageRef.current === currentPage) return
+    if (currentPage === 1) return
 
     productSectionRef.current?.scrollIntoView({
       behavior: 'smooth',
       block: 'start'
     })
-
-    prevPageRef.current = currentPage
   }, [currentPage])
 
   useEffect(() => {
-    if (isFilterOpen) {
-      document.documentElement.style.overflow = 'hidden'
-    } else {
-      document.documentElement.style.overflow = 'unset'
-    }
+    document.documentElement.style.overflow = isFilterOpen ? 'hidden' : 'unset'
 
     return () => {
       document.documentElement.style.overflow = 'unset'
     }
   }, [isFilterOpen])
+
   const availableSizes = useMemo(() => {
     const sizeSet = new Set()
+
     products.forEach(product => {
       product.variants?.forEach(variant => {
-        if (variant.size) sizeSet.add(variant.size)
+        if (variant.size) {
+          sizeSet.add(variant.size)
+        }
       })
     })
+
     return Array.from(sizeSet).sort()
   }, [products])
 
   const availableColors = useMemo(() => {
     const colorSet = new Set()
+
     products.forEach(product => {
       product.variants?.forEach(variant => {
-        if (variant.colorName) colorSet.add(variant.colorName)
+        if (variant.colorName) {
+          colorSet.add(variant.colorName)
+        }
       })
     })
+
     return Array.from(colorSet)
   }, [products])
+
+  const availableCategory = useMemo(() => {
+    const map = new Map()
+
+    products.forEach(product => {
+      if (product.category) {
+        map.set(product.category._id, product.category)
+      }
+    })
+
+    return Array.from(map.values())
+  }, [products])
+
+  const isMobile = useDevice()
+  const { mobileNavHeight, desktopNavHeight } = useHeight()
   return (
     <div
+
       className='min-h-screen transition-colors duration-300 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'
       dir='rtl'
     >
@@ -233,9 +257,10 @@ export default function Productswrapper ({
         setFilters={setFilters}
         sizes={availableSizes}
         colors={availableColors}
+        availableCategory={availableCategory}
       />
 
-      <Herosection />
+      <Herosection marginT={isMobile ? mobileNavHeight : desktopNavHeight} />
 
       <Cardnotification
         color={notification.type === 'success' ? 'bg-green-600' : 'bg-red-600'}
@@ -245,30 +270,32 @@ export default function Productswrapper ({
       />
 
       <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
-        <Category categories={categories} />
-
         <div ref={productSectionRef} className='scroll-mt-24'>
           <div className='flex flex-col md:flex-row justify-between items-center mb-8 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700'>
             <div className='flex items-center gap-2 mb-4 md:mb-0'>
               <h2 className='text-xl font-bold text-gray-800 dark:text-white'>
                 محصولات
               </h2>
+
               <span className='text-sm text-gray-500 dark:text-gray-400'>
-                ({sortedAndFilteredProduct.length} مورد)
+                ({totalProducts} مورد)
               </span>
             </div>
 
             <div className='flex gap-3 w-full md:w-auto'>
               <Filters setIsFilterOpen={setIsFilterOpen} filters={filters} />
+
               <Sortdropdown sortBy={sortBy} setSortBy={setSortBy} />
             </div>
           </div>
         </div>
 
         <section className='mb-16'>
-          {currentItems.length > 0 ? (
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
-              {currentItems.filter(Boolean).map(product => (
+          {/* Products */}
+
+          {sortedAndFilteredProduct.length > 0 ? (
+            <div className='grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
+              {sortedAndFilteredProduct.filter(Boolean).map(product => (
                 <Productcard
                   key={product._id}
                   product={product}
@@ -283,17 +310,14 @@ export default function Productswrapper ({
             </div>
           )}
 
-          {totalPages > 1 && (
-            <Pagenationadminproduct
-              allProducts={totalItems}
-              totalPages={totalPages}
-              setCurrentPage={setCurrentPage}
-              currentPage={currentPage}
-              indexOfFirstProduct={indexOfFirstItem}
-              indexOfLastProduct={indexOfLastItem}
-              name='محصول'
-            />
-          )}
+          <Pagenationbackendproduct
+            allProducts={totalProducts}
+            totalPages={totalPages}
+            currentPage={currentPage}
+            limit={8}
+            name='محصول'
+            title='products'
+          />
         </section>
       </main>
     </div>

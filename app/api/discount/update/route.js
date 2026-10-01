@@ -20,10 +20,9 @@ export async function PATCH(req) {
       )
     }
 
-    // ✅ فقط ادمین
-    if (auth.user?.role !== "ADMIN") {
+    if (auth.user?.role !== 'ADMIN' &&  auth.user?.role !== 'SUPER_ADMIN' ) {
       return NextResponse.json(
-        { message: "دسترسی غیرمجاز" },
+        { message: 'دسترسی غیر مجاز' },
         { status: 403 }
       )
     }

@@ -17,10 +17,13 @@ import { useCart } from '@/components/utils/CartContext'
 import Cardnotification from '@/components/modules/cardnotification/Cardnotification'
 import Addressform from '@/components/modules/profile/addressform/Addressform'
 import Customfetch from '@/components/utils/CustomeFetch'
+import { useHeight } from '@/components/utils/navHeightContext'
+import { useDevice } from '@/components/utils/helper'
 
 export default function Cartwrapper ({ shippings, address }) {
   const router = useRouter()
-
+  const isMobile = useDevice()
+  const { mobileNavHeight, desktopNavHeight } = useHeight()
   const gateways = [
     {
       id: 'ZARINPAL',
@@ -227,9 +230,6 @@ export default function Cartwrapper ({ shippings, address }) {
         return
       }
 
-      // ریدایرکت به درگاه پرداخت — چون paymentUrl یه آدرس بیرونیه (بانک/زرین‌پال و ...)،
-      // نه یه مسیر داخلی برنامه، باید با window.location هدایت بشه نه router.push
-      // (router.push فقط برای ناوبری داخل همین اپ Next.js کار می‌کنه)
       window.location.href = paymentData.paymentUrl
     } catch (error) {
       console.error(error)
@@ -250,11 +250,10 @@ export default function Cartwrapper ({ shippings, address }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newAddress)
       })
-      console.log(response)
 
       if (response.ok) {
         const data = await response.json()
-        
+
         showNotification('success', 'آدرس شما با موفقیت ثبت شد.')
       } else {
         showNotification('error', 'خطا در ثبت آدرس')
@@ -283,10 +282,16 @@ export default function Cartwrapper ({ shippings, address }) {
         desc='آیا از حذف این محصول اطمینان دارید؟'
       />
 
-      <div className='max-w-6xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8'>
-        {/* header */}
-        <div className='flex items-center justify-between mb-4 sm:mb-6'>
-          <div>
+      <div        style={{
+            marginTop: `${
+              isMobile ? mobileNavHeight  : desktopNavHeight 
+            }px`}}
+      
+      className='max-w-6xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8'>
+        <div className='flex  items-center justify-between mb-4 sm:mb-6'>
+          <div
+
+          >
             <h1 className='text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white'>
               سبد خرید
             </h1>

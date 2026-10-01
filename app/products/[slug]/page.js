@@ -1,9 +1,12 @@
 import ConnectToDB from '@/app/lib/mongodb'
+import Headermobile from '@/components/modules/headermobile/Headermobile'
 import Footer from '@/components/templates/footer/Footer'
 import Menumobile from '@/components/templates/menuMoblie/Menumobile'
 import Navbar from '@/components/templates/navbar/Navbar'
 import Productpagewrapper from '@/components/templates/productpagewrapper/Productpagewrapper'
 import { getAuthFromCookies } from '@/components/utils/authServer'
+import { Getbanners } from '@/components/utils/helperServer'
+import GeneralModel from '@/model/GeneralModel'
 import ProductModel from '@/model/ProductModel'
 import Reviewmodel from '@/model/Reviewmodel'
 import Usermodel from '@/model/Usermodel'
@@ -102,41 +105,51 @@ async function Productpage ({ params }) {
   const { slug } = await params
   const { isLoggedIn, user } = await getAuthFromCookies()
 
- let productData = null
-let userData = null
-let reviewData = []
+  let productData = null
+  let userData = null
+  let reviewData = []
+  let logoData = null
+  try {
+    await ConnectToDB()
+    logoData = await GeneralModel.findOne(
+      {},
+      { siteLogo: 1, siteName: 1 }
+    ).lean()
 
-try {
-  await ConnectToDB()
+    if (isLoggedIn && user?.userId) {
+      userData = await Usermodel.findById(user.userId.toString())
+        .populate('wishlist')
+        .lean()
+    }
 
-  if (isLoggedIn && user?.userId) {
-    userData = await Usermodel.findById(user.userId.toString())
-      .populate('wishlist')
+    productData = await ProductModel.findOne({ slug, isActive: true })
+      .populate({
+        path: 'category',
+        populate: {
+          path: 'parent'
+        }
+      })
       .lean()
+  } catch (error) {
+    console.error('خطا در دریافت دیتای سمت سرور:', error)
+    notFound()
   }
 
-  productData = await ProductModel.findOne({ slug, isActive: true })
-    .populate('category')
+  if (!productData) {
+    notFound()
+  }
+
+  reviewData = await Reviewmodel.find({
+    product: productData._id,
+    isApproved: true
+  })
+    .populate('user', 'name avatar')
+    .sort({ createdAt: -1 })
+    .limit(10)
     .lean()
 
-} catch (error) {
-  console.error('خطا در دریافت دیتای سمت سرور:', error)
-  notFound()   // اگر خطای دیتابیس بود مستقیم 404
-}
-
-if (!productData) {
-  notFound()
-}
-
-reviewData = await Reviewmodel.find({
-  product: productData._id,
-  isApproved: true
-})
-  .populate('user', 'name avatar')
-  .sort({ createdAt: -1 })
-  .lean()
-
-
+  const logo = JSON.parse(JSON.stringify(logoData))
+  const banners = await Getbanners()
   const product = JSON.parse(JSON.stringify(productData))
   const review = JSON.parse(JSON.stringify(reviewData || []))
   const finaluser = isLoggedIn
@@ -161,7 +174,7 @@ reviewData = await Reviewmodel.find({
     image: product.images?.length
       ? product.images.map(image => getAbsoluteUrl(image))
       : [getAbsoluteUrl()],
-    sku: product._id,
+
     category: product.category?.name,
     brand: {
       '@type': 'Brand',
@@ -255,6 +268,7 @@ reviewData = await Reviewmodel.find({
       />
 
       <Navbar />
+      <Headermobile logo={logo} banners={banners} />
       <Menumobile />
 
       <Productpagewrapper

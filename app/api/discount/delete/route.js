@@ -10,7 +10,6 @@ export async function DELETE(req) {
 
     const auth = await getAuthFromCookies()
 
-    // ✅ بررسی لاگین
     if (!auth?.isLoggedIn) {
       return NextResponse.json(
         { error: 'ابتدا وارد شوید' },
@@ -18,10 +17,11 @@ export async function DELETE(req) {
       )
     }
 
-    // ✅ فقط ادمین
-    if (auth.user?.role !== 'ADMIN') {
+    
+ 
+    if (auth.user?.role !== 'ADMIN' &&  auth.user?.role !== 'SUPER_ADMIN' ) {
       return NextResponse.json(
-        { error: 'دسترسی غیرمجاز' },
+        { message: 'دسترسی غیر مجاز' },
         { status: 403 }
       )
     }

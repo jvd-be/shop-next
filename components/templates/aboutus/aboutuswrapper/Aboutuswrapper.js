@@ -1,3 +1,4 @@
+'use client'
 import {
   FaBullseye,
   FaHandshake,
@@ -14,10 +15,12 @@ import {
 import Herosection from '@/components/modules/aboutus/herosection/Herosection'
 
 import Ourstory from '@/components/templates/aboutus/ourstory/Ourstory'
+import { useHeight } from '@/components/utils/navHeightContext'
+import { useDevice } from '@/components/utils/helper'
 
 export default function Aboutuswrapper ({ productsCount }) {
-  console.log(productsCount);
-  
+  const { mobileNavHeight, desktopNavHeight } = useHeight()
+  const isMobile = useDevice()
   const aboutData = {
     name: 'فروشگاه ما',
     tagline: 'بهترین انتخاب برای سبک زندگی شما',
@@ -81,7 +84,12 @@ export default function Aboutuswrapper ({ productsCount }) {
     ]
   }
   return (
-    <div className='min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors'>
+    <div
+      style={{
+        marginTop: `${isMobile ? mobileNavHeight : desktopNavHeight}px`
+      }}
+      className='min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors'
+    >
       {/* Hero Section */}
       <Herosection aboutData={aboutData} />
 

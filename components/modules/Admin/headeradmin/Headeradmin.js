@@ -7,7 +7,10 @@ export default function Headeradmin ({
   btncontent,
   desc,
   handleOpenModal,
-  
+  exportToExcel,
+  excelData,
+  excelHeaders,
+  excelFilename = 'export.csv'
 }) {
   return (
     <div className='flex flex-col md:flex-row justify-between items-center mb-6 gap-4'>
@@ -20,7 +23,13 @@ export default function Headeradmin ({
       <div className='flex gap-2'>
         {excelactive ? (
           <button
-            // onClick={exportToExcel}
+            onClick={() =>
+              exportToExcel({
+                data: excelData,
+                headers: excelHeaders,
+                filename: excelFilename
+              })
+            }
             className='flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors shadow-md'
           >
             <FaDownload />

@@ -9,10 +9,11 @@ export default function Quantity ({ quantityPerSize, quantity, setQuantity }) {
         <h3 className='text-sm font-semibold text-gray-800 dark:text-gray-200'>
           تعداد
         </h3>
-{quantityPerSize<5? <span className='text-sm text-amber-600 dark:text-amber-400 font-medium'>
-          فقط {quantityPerSize} عدد موجود است
-        </span>:null}
-       
+        {quantityPerSize < 5 && quantityPerSize !== 0 ? (
+          <span className='text-sm text-amber-600 dark:text-amber-400 font-medium'>
+            فقط {quantityPerSize} عدد موجود است
+          </span>
+        ) : null}
       </div>
 
       {/* کنترل تعداد */}

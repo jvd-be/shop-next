@@ -5,6 +5,7 @@ import CartProvider from '@/components/utils/CartContext'
 import { getAuthFromCookies } from '@/components/utils/authServer'
 import ConnectToDB from '@/app/lib/mongodb'
 import GeneralModel from '@/model/GeneralModel'
+import HeightProvider from '@/components/utils/navHeightContext'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -122,15 +123,16 @@ export default async function RootLayout ({ children }) {
   const { isLoggedIn } = await getAuthFromCookies()
 
   return (
- <html lang="fa" dir="rtl" suppressHydrationWarning>
-     <body
-  className={`${geistSans.variable} ${geistMono.variable} bg-white text-gray-900 dark:bg-gray-800 dark:text-white`}
->
-        <ThemeProvider>
-          <CartProvider isLoggedIn={isLoggedIn}>{children}</CartProvider>
-        </ThemeProvider>
+    <html lang='fa' dir='rtl' suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} bg-white text-gray-900 dark:bg-gray-800 dark:text-white`}
+      >
+        <HeightProvider>
+          <ThemeProvider>
+            <CartProvider isLoggedIn={isLoggedIn}>{children}</CartProvider>
+          </ThemeProvider>
+        </HeightProvider>
       </body>
     </html>
   )
 }
-      

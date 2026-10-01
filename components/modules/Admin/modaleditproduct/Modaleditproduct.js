@@ -179,7 +179,6 @@ const Modaleditproduct = ({
         body: formDataToSend
       })
 
-
       if (res.ok) {
         const data = await res.json()
 
@@ -512,10 +511,14 @@ const Modaleditproduct = ({
                     <div className='col-span-3'>
                       <input
                         onChange={e =>
-                          handleVariantsChange(index, 'colorName', e.target.value)
+                          handleVariantsChange(
+                            index,
+                            'colorName',
+                            e.target.value
+                          )
                         }
                         type='text'
-                        value={item.colorName || ""}
+                        value={item.colorName || ''}
                         name='colorName'
                         placeholder='نام رنگ'
                         className='w-full border-gray-300 rounded-md shadow-sm border p-2 text-sm'
@@ -535,7 +538,7 @@ const Modaleditproduct = ({
                     <div className='col-span-3'>
                       <input
                         type='text'
-                        value={item.quantity}
+                        value={item.quantity || 0}
                         onChange={e =>
                           handleVariantsChange(
                             index,

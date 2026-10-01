@@ -1,24 +1,24 @@
 'use client'
 
-import React,{useState} from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
-import { FaShareNodes,FaCheck } from 'react-icons/fa6'
+import { FaShareNodes, FaCheck } from 'react-icons/fa6'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import Fashioncard from '@/components/modules/fashioncard/Fashioncard'
-
+import { useDevice } from '@/components/utils/helper'
+import { useHeight } from '@/components/utils/navHeightContext'
 
 const Blogcontent = ({ body }) => {
-  // گارد اصلی: اگر body وجود نداشت یا آرایه نبود، چیزی رندر نکن
   if (!body || !Array.isArray(body) || body.length === 0) {
     return null
   }
 
   return (
-    <div className='space-y-6 font-vazir text-base md:text-lg leading-relaxed text-gray-700 dark:text-gray-300'>
+    <div className='space-y-6 font-vazir text-base md:text-lg leading-relaxed  text-gray-700 dark:text-gray-300'>
       {body.map((block, index) => (
         <div key={block._id || index} className='mb-8'>
           {block.subTitle && (
@@ -55,65 +55,71 @@ const Blogcontent = ({ body }) => {
   )
 }
 
-// --- کامپوننت صفحه اصلی ---
 export default function Blogpagewrapper ({ Blog, relatedPosts = [] }) {
-const [copied, setCopied] = useState(false)
-const handleShare = async () => {
-  const url = window.location.href
+  const [copied, setCopied] = useState(false)
+  const isMobile = useDevice()
+  const { mobileNavHeight, desktopNavHeight } = useHeight()
+  const handleShare = async () => {
+    const url = window.location.href
 
-  const shareData = {
-    title: Blog.title,
-    text: Blog.description || '',
-    url
-  }
-
-  // Web Share API
-  if (navigator.share) {
-    try {
-      await navigator.share(shareData)
-      return
-    } catch (err) {
-      if (err.name === 'AbortError') return
-      console.error(err)
+    const shareData = {
+      title: Blog.title,
+      text: Blog.description || '',
+      url
     }
-  }
 
-  // Clipboard API
-  if (navigator.clipboard?.writeText) {
+    // Web Share API
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData)
+        return
+      } catch (err) {
+        if (err.name === 'AbortError') return
+        console.error(err)
+      }
+    }
+
+    // Clipboard API
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(url)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+        return
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
+    // آخرین fallback برای Safari
     try {
-      await navigator.clipboard.writeText(url)
+      const input = document.createElement('input')
+      input.value = url
+      document.body.appendChild(input)
+
+      input.select()
+      input.setSelectionRange(0, 99999)
+
+      document.execCommand('copy')
+
+      document.body.removeChild(input)
+
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-      return
     } catch (err) {
-      console.error(err)
+      console.error('Copy failed:', err)
     }
   }
-
-  // آخرین fallback برای Safari
-  try {
-    const input = document.createElement('input')
-    input.value = url
-    document.body.appendChild(input)
-
-    input.select()
-    input.setSelectionRange(0, 99999)
-
-    document.execCommand('copy')
-
-    document.body.removeChild(input)
-
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  } catch (err) {
-    console.error('Copy failed:', err)
-  }
-}
   // گارد: اگر Blog هنوز نرسیده باشه
   if (!Blog) return null
 
   return (
-    <div className='min-h-screen font-vazir bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 selection:bg-blue-200 dark:selection:bg-blue-900'>
+    <div
+      style={{
+        marginTop: `${isMobile ? mobileNavHeight : desktopNavHeight}px`
+      }}
+      className='min-h-screen font-vazir  bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 selection:bg-blue-200 dark:selection:bg-blue-900'
+    >
       <main className='pt-4 md:pt-6 pb-20'>
         {/* 1. هدر مقاله */}
         <header className='max-w-3xl mx-auto px-4 mb-8 md:mb-12 text-center'>

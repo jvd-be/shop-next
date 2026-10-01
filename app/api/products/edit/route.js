@@ -5,10 +5,26 @@ import ProductModel from '@/model/ProductModel'
 import path from 'path'
 import { randomUUID } from 'crypto'
 import { writeFile, mkdir } from 'fs/promises'
+import { getAuthFromCookies } from '@/components/utils/authServer'
 
 export async function PUT(req) {
   await ConnectToDB()
+  const auth = await getAuthFromCookies()
 
+    if (!auth?.isLoggedIn) {
+      return NextResponse.json(
+        { message: "ابتدا وارد شوید" },
+        { status: 401 }
+      )
+    }
+
+   
+    if (auth.user?.role !== 'ADMIN' &&  auth.user?.role !== 'SUPER_ADMIN' ) {
+      return NextResponse.json(
+        { message: 'دسترسی غیر مجاز' },
+        { status: 403 }
+      )
+    }
   try {
     const formData = await req.formData()
 

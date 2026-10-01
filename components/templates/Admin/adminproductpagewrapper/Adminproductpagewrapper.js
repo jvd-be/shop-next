@@ -10,7 +10,7 @@ import Productadminnavbar from '@/components/modules/Admin/adminnavbar/Adminnavb
 import Rowproductadmin from '@/components/modules/Admin/rowproductadmin/Rowproductadmin'
 import Cardnotification from '@/components/modules/cardnotification/Cardnotification'
 import Deletemodal from '@/components/modules/cart/deletemodal/Deletemodal'
-import { findById } from '@/components/utils/helper'
+import { exportToExcel, findById } from '@/components/utils/helper'
 import { useEffect, useMemo, useState } from 'react'
 import { HiOutlineExclamationCircle } from 'react-icons/hi'
 import {
@@ -221,6 +221,23 @@ export default function Adminproductspagewrapper ({
         btncontent='اضافه کردن محصول'
         addbtn={true}
         handleOpenModal={handleOpenModal}
+        excelactive={true}
+        exportToExcel={exportToExcel}
+        excelData={products}
+        excelHeaders={{
+          title: 'نام محصول',
+          price: 'قیمت',
+          discount: 'تخفیف',
+          finalPrice: 'قیمت نهایی',
+          isActive: 'وضعیت',
+          totalQuantity: 'موجودی',
+          soldCount:"تعداد فروش",
+          isFeatured: 'ویژه',
+          variants:"رنگ و سایز",
+          createdAt: 'تاریخ ایجاد محصول',
+          updatedAt: 'تاریخ اخرین اپدیت '
+        }}
+        excelFilename='products.csv'
       />
       <Cardnotification
         show={notification.show}

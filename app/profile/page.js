@@ -11,10 +11,13 @@ import TicketCategorymodel from '@/model/TicketCategorymodel'
 import Ticketmodel from '@/model/Ticketmodel'
 import Ticketmessagemodel from '@/model/Ticketmessagemodel'
 import Popups from '@/components/templates/popups/Popups'
-import { GetPopups } from '@/components/utils/helperServer'
+import { Getbanners, GetPopups } from '@/components/utils/helperServer'
+import Headermobile from '@/components/modules/headermobile/Headermobile'
+import GeneralModel from '@/model/GeneralModel'
 
 export default async function page () {
   const { isLoggedIn, user } = await getAuthFromCookies()
+  let logoData = null
   const popups = await GetPopups()
   if (!isLoggedIn || !user?.userId) {
     redirect('/signup')
@@ -26,30 +29,30 @@ export default async function page () {
   let userOrders = []
   let categoryTicket = []
   let tickets = []
-const userData = await Usermodel.findById(user.userId).populate('wishlist').lean()
+  const userData = await Usermodel.findById(user.userId)
+    .populate('wishlist')
+    .lean()
 
-if (!userData) {
-  redirect('/signup')
-}
+  if (!userData) {
+    redirect('/signup')
+  }
   try {
-    const [ ordersData, categoryTicketData, ticketsData] =
-      await Promise.all([
-       
+    const [ordersData, categoryTicketData, ticketsData] = await Promise.all([
+      Ordermodel.find({ user: user.userId }).sort({ _id: -1 }).lean(),
 
-        Ordermodel.find({ user: user.userId }).sort({ _id: -1 }).lean(),
+      TicketCategorymodel.find({
+        isActive: true
+      }).lean(),
 
-        TicketCategorymodel.find({
-          isActive: true
-        }).lean(),
-
-        Ticketmodel.find({ user: user.userId })
-          .populate('category')
-          .sort({ lastMessageAt: -1, createdAt: -1 })
-          .lean()
-      ])
-
- 
-
+      Ticketmodel.find({ user: user.userId })
+        .populate('category')
+        .sort({ lastMessageAt: -1, createdAt: -1 })
+        .lean()
+    ])
+    logoData = await GeneralModel.findOne(
+      {},
+      { siteLogo: 1, siteName: 1 }
+    ).lean()
     const ticketIds = ticketsData.map(ticket => ticket._id)
 
     const ticketMessagesData =
@@ -91,12 +94,14 @@ if (!userData) {
   } catch (error) {
     console.error('Error fetching profile data:', error)
   }
-
+  const logo = JSON.parse(JSON.stringify(logoData))
+  const banners = await Getbanners()
   return (
     <>
       <Navbar />
+      <Headermobile logo={logo} banners={banners} />
       <Menumobile />
-    
+
       <Profilewrapper
         user={fullUserData}
         orders={userOrders}

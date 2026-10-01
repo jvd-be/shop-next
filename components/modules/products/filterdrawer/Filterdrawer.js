@@ -2,16 +2,16 @@
 import React, { useEffect } from 'react'
 import { FiX, FiSliders, FiCheck } from 'react-icons/fi'
 
-export default function Filterdrawer({
+export default function Filterdrawer ({
   isOpen,
   onClose,
-  categories = [],
   filters,
   setFilters,
-  sizes = [],      // ← از والد پاس داده می‌شود
-  colors = [],     // ← از والد پاس داده می‌شود
+  sizes = [],
+  colors = [],
   materials = [],
-  genders = []
+  genders = [],
+  availableCategory = []
 }) {
   // بستن با ESC + قفل اسکرول
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function Filterdrawer({
     (filters.materials?.length ? 1 : 0) +
     (filters.onSale ? 1 : 0)
 
-  const toggleCategory = (id) => {
+  const toggleCategory = id => {
     const categoryId = String(id)
     setFilters(prev => ({
       ...prev,
@@ -53,7 +53,7 @@ export default function Filterdrawer({
     }))
   }
 
-  const toggleSize = (size) => {
+  const toggleSize = size => {
     setFilters(prev => ({
       ...prev,
       sizes: prev.sizes?.includes(size)
@@ -62,7 +62,7 @@ export default function Filterdrawer({
     }))
   }
 
-  const toggleColor = (color) => {
+  const toggleColor = color => {
     setFilters(prev => ({
       ...prev,
       colors: prev.colors?.includes(color)
@@ -71,7 +71,7 @@ export default function Filterdrawer({
     }))
   }
 
-  const toggleMaterial = (material) => {
+  const toggleMaterial = material => {
     setFilters(prev => ({
       ...prev,
       materials: prev.materials?.includes(material)
@@ -110,19 +110,23 @@ export default function Filterdrawer({
         bg-white dark:bg-gray-900 
         rounded-t-3xl md:rounded-none shadow-2xl
         transform transition-transform duration-300 ease-out
-        ${isOpen ? 'translate-y-0 md:translate-x-0' : 'translate-y-full md:translate-x-full'}`}
+        ${
+          isOpen
+            ? 'translate-y-0 md:translate-x-0'
+            : 'translate-y-full md:translate-x-full'
+        }`}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-rose-100 dark:bg-rose-950 flex items-center justify-center">
-              <FiSliders className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+        <div className='sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-5 flex items-center justify-between'>
+          <div className='flex items-center gap-3'>
+            <div className='w-10 h-10 rounded-2xl bg-rose-100 dark:bg-rose-950 flex items-center justify-center'>
+              <FiSliders className='w-5 h-5 text-rose-600 dark:text-rose-400' />
             </div>
             <div>
-              <h3 className="font-bold text-xl text-gray-900 dark:text-white">
+              <h3 className='font-bold text-xl text-gray-900 dark:text-white'>
                 فیلتر محصولات
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className='text-sm text-gray-500 dark:text-gray-400'>
                 {activeCount > 0 ? `${activeCount} فیلتر فعال` : 'همه محصولات'}
               </p>
             </div>
@@ -130,37 +134,46 @@ export default function Filterdrawer({
 
           <button
             onClick={onClose}
-            className="p-3 rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className='p-3 rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
           >
-            <FiX className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+            <FiX className='w-6 h-6 text-gray-600 dark:text-gray-400' />
           </button>
         </div>
 
         {/* Content */}
-        <div className="h-full overflow-y-auto px-6 py-6 space-y-9 pb-28">
-          
+        <div className='h-full overflow-y-auto px-6 py-6 space-y-9 pb-28'>
           {/* Price Range */}
-          <div className="space-y-4">
-            <h4 className="font-semibold text-lg text-gray-900 dark:text-white">بازه قیمت (تومان)</h4>
-            <div className="grid grid-cols-2 gap-4">
+          <div className='space-y-4'>
+            <h4 className='font-semibold text-lg text-gray-900 dark:text-white'>
+              بازه قیمت (تومان)
+            </h4>
+            <div className='grid grid-cols-2 gap-4'>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">حداقل قیمت</label>
+                <label className='block text-xs text-gray-500 dark:text-gray-400 mb-1.5'>
+                  حداقل قیمت
+                </label>
                 <input
-                  type="number"
+                  type='number'
                   value={filters.minPrice}
-                  onChange={e => setFilters(prev => ({ ...prev, minPrice: e.target.value }))}
-                  placeholder="۲۰۰٬۰۰۰"
-                  className="w-full px-4 py-3.5 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:border-rose-500 transition-colors"
+                  onChange={e =>
+                    setFilters(prev => ({ ...prev, minPrice: e.target.value }))
+                  }
+                  placeholder='۲۰۰٬۰۰۰'
+                  className='w-full px-4 py-3.5 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:border-rose-500 transition-colors'
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5">حداکثر قیمت</label>
+                <label className='block text-xs text-gray-500 dark:text-gray-400 mb-1.5'>
+                  حداکثر قیمت
+                </label>
                 <input
-                  type="number"
+                  type='number'
                   value={filters.maxPrice}
-                  onChange={e => setFilters(prev => ({ ...prev, maxPrice: e.target.value }))}
-                  placeholder="۲٬۵۰۰٬۰۰۰"
-                  className="w-full px-4 py-3.5 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:border-rose-500 transition-colors"
+                  onChange={e =>
+                    setFilters(prev => ({ ...prev, maxPrice: e.target.value }))
+                  }
+                  placeholder='۲٬۵۰۰٬۰۰۰'
+                  className='w-full px-4 py-3.5 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:border-rose-500 transition-colors'
                 />
               </div>
             </div>
@@ -168,13 +181,18 @@ export default function Filterdrawer({
 
           {/* Gender */}
           {genders.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="font-semibold text-lg">جنسیت</h4>
-              <div className="flex flex-wrap gap-2">
+            <div className='space-y-3'>
+              <h4 className='font-semibold text-lg'>جنسیت</h4>
+              <div className='flex flex-wrap gap-2'>
                 {genders.map(g => (
                   <button
                     key={g.value}
-                    onClick={() => setFilters(prev => ({ ...prev, gender: prev.gender === g.value ? '' : g.value }))}
+                    onClick={() =>
+                      setFilters(prev => ({
+                        ...prev,
+                        gender: prev.gender === g.value ? '' : g.value
+                      }))
+                    }
                     className={`px-5 py-3 rounded-2xl border text-sm font-medium transition-all ${
                       filters.gender === g.value
                         ? 'bg-rose-600 text-white border-rose-600'
@@ -190,9 +208,9 @@ export default function Filterdrawer({
 
           {/* Sizes */}
           {sizes.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="font-semibold text-lg">سایز</h4>
-              <div className="grid grid-cols-4 gap-2">
+            <div className='space-y-3'>
+              <h4 className='font-semibold text-lg'>سایز</h4>
+              <div className='grid grid-cols-4 gap-2'>
                 {sizes.map(size => (
                   <button
                     key={size}
@@ -212,9 +230,9 @@ export default function Filterdrawer({
 
           {/* Colors */}
           {colors.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="font-semibold text-lg">رنگ</h4>
-              <div className="flex flex-wrap gap-2">
+            <div className='space-y-3'>
+              <h4 className='font-semibold text-lg'>رنگ</h4>
+              <div className='flex flex-wrap gap-2'>
                 {colors.map(color => (
                   <button
                     key={color}
@@ -232,11 +250,33 @@ export default function Filterdrawer({
             </div>
           )}
 
+          {availableCategory.length > 0 && (
+            <div className='space-y-3'>
+              <h4 className='font-semibold text-lg'>دسته‌بندی</h4>
+
+              <div className='flex flex-wrap gap-2'>
+                {availableCategory.map(category => (
+                  <button
+                    key={category._id}
+                    onClick={() => toggleCategory(category._id)}
+                    className={`px-5 py-3 rounded-2xl border transition-all ${
+                      filters.categories.includes(category._id)
+                        ? 'bg-rose-600 text-white border-rose-600'
+                        : 'border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Materials */}
           {materials.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="font-semibold text-lg">جنس پارچه</h4>
-              <div className="grid grid-cols-2 gap-2">
+            <div className='space-y-3'>
+              <h4 className='font-semibold text-lg'>جنس پارچه</h4>
+              <div className='grid grid-cols-2 gap-2'>
                 {materials.map(mat => (
                   <button
                     key={mat}
@@ -255,32 +295,37 @@ export default function Filterdrawer({
           )}
 
           {/* On Sale */}
-          <div className="flex items-center gap-3 pt-4">
+          <div className='flex items-center gap-3 pt-4'>
             <input
-              type="checkbox"
-              id="onSale"
+              type='checkbox'
+              id='onSale'
               checked={filters.onSale}
-              onChange={e => setFilters(prev => ({ ...prev, onSale: e.target.checked }))}
-              className="w-5 h-5 accent-rose-600 cursor-pointer"
+              onChange={e =>
+                setFilters(prev => ({ ...prev, onSale: e.target.checked }))
+              }
+              className='w-5 h-5 accent-rose-600 cursor-pointer'
             />
-            <label htmlFor="onSale" className="font-medium cursor-pointer select-none">
+            <label
+              htmlFor='onSale'
+              className='font-medium cursor-pointer select-none'
+            >
               فقط محصولات تخفیف‌دار
             </label>
           </div>
         </div>
 
         {/* Footer */}
-       <div className="sticky bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-5 flex gap-3 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-20">
+        <div className='sticky bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-5 flex gap-3 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-20'>
           <button
             onClick={clearFilters}
-            className="flex-1 py-4 text-base font-medium rounded-2xl border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            className='flex-1 py-4 text-base font-medium rounded-2xl border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors'
           >
             پاک کردن همه
           </button>
 
           <button
             onClick={onClose}
-            className="flex-1 py-4 text-base font-semibold rounded-2xl bg-black dark:bg-white text-white dark:text-black hover:bg-gray-900 dark:hover:bg-gray-200 transition-all active:scale-[0.985]"
+            className='flex-1 py-4 text-base font-semibold rounded-2xl bg-black dark:bg-white text-white dark:text-black hover:bg-gray-900 dark:hover:bg-gray-200 transition-all active:scale-[0.985]'
           >
             اعمال فیلترها
           </button>

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import ConnectToDB from "@/configs/db"
+import ConnectToDB from "@/app/lib/mongodb"
 import ShippingModel from "@/model/Shippingmodel"
 
 

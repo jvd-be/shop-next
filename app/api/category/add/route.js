@@ -4,11 +4,26 @@ import path from 'path'
 import { writeFile } from 'fs/promises'
 import { NextResponse } from 'next/server'
 import { randomUUID } from 'crypto'
+import { getAuthFromCookies } from '@/components/utils/authServer'
 
-export async function POST(req) {
-
+export async function POST (req) {
   try {
-
+      const auth = await getAuthFromCookies()
+    
+        if (!auth?.isLoggedIn) {
+          return NextResponse.json(
+            { message: "ابتدا وارد شوید" },
+            { status: 401 }
+          )
+        }
+    
+       
+        if (auth.user?.role !== 'ADMIN' &&  auth.user?.role !== 'SUPER_ADMIN' ) {
+          return NextResponse.json(
+            { message: 'دسترسی غیر مجاز' },
+            { status: 403 }
+          )
+        }
     await ConnectToDB()
 
     const formData = await req.formData()
@@ -27,7 +42,7 @@ export async function POST(req) {
     if (!slug) errors.push('اسلاگ الزامی است')
     if (!order && order !== 0) errors.push('ترتیب نمایش الزامی است')
     if (!description) errors.push('توضیحات الزامی است')
-    if (!image || typeof image === "string") errors.push('تصویر الزامی است')
+    if (!image || typeof image === 'string') errors.push('تصویر الزامی است')
 
     if (errors.length > 0) {
       return NextResponse.json({ errors }, { status: 400 })
@@ -66,7 +81,9 @@ export async function POST(req) {
     // ✅ ذخیره فایل
     const pathImage = path.join(process.cwd(), 'public', 'images', 'category')
 
-    const safeFileName = `${Date.now()}-${randomUUID()}.${image.type.split('/')[1]}`
+    const safeFileName = `${Date.now()}-${randomUUID()}.${
+      image.type.split('/')[1]
+    }`
 
     const filepath = path.join(pathImage, safeFileName)
 
@@ -76,7 +93,7 @@ export async function POST(req) {
 
     const savedImagePath = `/images/category/${safeFileName}`
 
-    await Categorymodel.create({
+    const category = await Categorymodel.create({
       name,
       slug,
       order,
@@ -87,17 +104,15 @@ export async function POST(req) {
     })
 
     return NextResponse.json(
-      { message: 'دسته بندی با موفقیت ایجاد شد' },
+      {
+        message: 'دسته بندی با موفقیت ایجاد شد',
+        category:category.toObject()
+      },
       { status: 201 }
     )
-
   } catch (error) {
-
     console.error(error)
 
-    return NextResponse.json(
-      { message: 'خطای سرور' },
-      { status: 500 }
-    )
+    return NextResponse.json({ message: 'خطای سرور' }, { status: 500 })
   }
 }

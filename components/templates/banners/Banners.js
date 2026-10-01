@@ -1,9 +1,9 @@
 import Topbanner from '@/components/modules/banners/topbanner/Topbanner'
 import React from 'react'
 
-export default function Banners ({ banners, bannerKey }) {
-  const banner = banners.find(item => item.key === bannerKey)
-    
+export default function Banners ({ banners=[], bannerKey }) {
+  const banner = banners?.find(item => item.key === bannerKey)
+
   if (!banner) return null
 
   switch (banner.key) {

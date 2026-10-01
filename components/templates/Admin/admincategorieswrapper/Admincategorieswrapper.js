@@ -192,6 +192,7 @@ export default function Admincategorieswrapper ({ category = [] }) {
       }
 
       setCategories(prev => [result.category, ...prev])
+      
       showNotification('success', 'دسته‌بندی با موفقیت اضافه شد')
       setIsModalOpen(false)
     } catch (error) {
@@ -334,28 +335,33 @@ export default function Admincategorieswrapper ({ category = [] }) {
           </thead>
 
           <tbody>
-            {currentItems.length > 0 ? (
-              currentItems.map(cat => {
-                const parentName =
-                  categories.find(c => c?._id === cat.parent)?.name || 'ریشه'
+   {currentItems.length > 0 ? (
+  (
 
-                return (
-                  <Rowcategories
-                    key={cat._id}
-                    cat={cat}
-                    parentName={parentName}
-                    openEditModal={openEditModal}
-                    toggleStatus={toggleStatus}
-                  />
-                )
-              })
-            ) : (
-              <tr>
-                <td colSpan='5' className='p-8 text-center'>
-                  دسته‌بندی یافت نشد
-                </td>
-              </tr>
-            )}
+    currentItems.filter(Boolean).map(cat => {
+      const parentName =
+        categories.find(
+          c => String(c?._id) === String(cat?.parent)
+        )?.name || 'ریشه'
+
+      return (
+        <Rowcategories
+          key={cat._id}
+          cat={cat}
+          parentName={parentName}
+          openEditModal={openEditModal}
+          toggleStatus={toggleStatus}
+        />
+      )
+    })
+  )
+) : (
+  <tr>
+    <td colSpan='5' className='p-8 text-center'>
+      دسته‌بندی یافت نشد
+    </td>
+  </tr>
+)}
           </tbody>
         </table>
 

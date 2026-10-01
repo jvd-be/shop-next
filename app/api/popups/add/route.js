@@ -91,9 +91,10 @@ export async function POST(req) {
       )
     }
 
-    if (auth.user?.role !== "ADMIN") {
+   
+    if (auth.user?.role !== 'ADMIN' &&  auth.user?.role !== 'SUPER_ADMIN' ) {
       return NextResponse.json(
-        { message: "دسترسی غیرمجاز" },
+        { message: 'دسترسی غیر مجاز' },
         { status: 403 }
       )
     }
@@ -150,6 +151,8 @@ export async function POST(req) {
     }
 
     const validationError = validateInput(inputData)
+
+    
     if (validationError) {
       return NextResponse.json(
         { success: false, message: validationError },

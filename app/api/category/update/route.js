@@ -4,9 +4,26 @@ import path from 'path'
 import { writeFile, mkdir } from 'fs/promises'
 import { NextResponse } from 'next/server'
 import { randomUUID } from 'crypto'
+import { getAuthFromCookies } from '@/components/utils/authServer'
 
 export async function PUT(req) {
   try {
+      const auth = await getAuthFromCookies()
+    
+        if (!auth?.isLoggedIn) {
+          return NextResponse.json(
+            { message: "ابتدا وارد شوید" },
+            { status: 401 }
+          )
+        }
+    
+       
+        if (auth.user?.role !== 'ADMIN' &&  auth.user?.role !== 'SUPER_ADMIN' ) {
+          return NextResponse.json(
+            { message: 'دسترسی غیر مجاز' },
+            { status: 403 }
+          )
+        }
     await ConnectToDB()
 
     const formData = await req.formData()

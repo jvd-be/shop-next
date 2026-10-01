@@ -10,18 +10,11 @@ import 'swiper/css/pagination'
 import 'swiper/css/navigation'
 
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'
+import { useHeight } from '@/components/utils/navHeightContext'
+import { useDevice } from '@/components/utils/helper'
 
 export default function HeroSlider ({ slider }) {
-  const [isMobile, setIsMobile] = useState(true)
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768)
-
-    handleResize()
-    window.addEventListener('resize', handleResize)
-
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  const isMobile = useDevice()
 
   const slides = useMemo(() => {
     if (!slider?.slides) return []
@@ -32,9 +25,12 @@ export default function HeroSlider ({ slider }) {
   }, [slider])
 
   if (!slider || slides.length === 0) return null
-
+  const { desktopNavHeight,mobileNavHeight } = useHeight()
   return (
-    <div className='relative w-full aspect-12/11   md:aspect-999/260 bg-gray-900 overflow-hidden'>
+    <div
+      style={{ marginTop: `${isMobile?mobileNavHeight:desktopNavHeight}px` }}
+      className='relative w-full aspect-12/11 md:aspect-999/260 bg-gray-900 overflow-hidden'
+    >
       <Swiper
         modules={[EffectFade, Autoplay, Pagination, Navigation]}
         spaceBetween={0}
@@ -68,66 +64,58 @@ export default function HeroSlider ({ slider }) {
         className='w-full h-full'
       >
         {slides.map(slide => (
-    <SwiperSlide key={slide._id}>
-  <div className='relative w-full h-full flex items-center justify-center'>
-    
-    {/* image */}
-    <div className='absolute inset-0 z-0'>
-      <img
-        src={
-          isMobile
-            ? slide.imageMobile || slide.imageDesktop
-            : slide.imageDesktop
-        }
-        alt={slide.title || 'slide'}
-        className='w-full h-full object-cover'
-      />
+          <SwiperSlide key={slide._id}>
+            <div className='relative w-full h-full flex items-center justify-center'>
+              {/* image */}
+              <div className='absolute inset-0 z-0'>
+                <img
+                  src={
+                    isMobile
+                      ? slide.imageMobile || slide.imageDesktop
+                      : slide.imageDesktop
+                  }
+                  alt={slide.title || 'slide'}
+                  className='w-full h-full object-cover'
+                />
 
-      {slide.overlay && (
-        <div
-          className='absolute inset-0 bg-black'
-          style={{ opacity: (slide.overlayOpacity || 20) / 100 }}
-        />
-      )}
-    </div>
+                {slide.overlay && (
+                  <div
+                    className='absolute inset-0 bg-black'
+                    style={{ opacity: (slide.overlayOpacity || 20) / 100 }}
+                  />
+                )}
+              </div>
 
-    {/* CONTENT */}
-    <div
-      className='relative z-10 text-left max-w-3xl px-6'
-      style={{ color: slide.textColor || '#fff' }}
-    >
-      {slide.title && (
-        <h2 className='text-3xl md:text-5xl font-bold mb-4'>
-          {slide.title}
-        </h2>
-      )}
+              <div
+                className='relative z-10 text-left max-w-3xl px-6'
+                style={{ color: slide.textColor || '#fff' }}
+              >
+                {slide.title && (
+                  <h2 className='text-3xl md:text-5xl font-bold mb-4'>
+                    {slide.title}
+                  </h2>
+                )}
 
-      {slide.subtitle && (
-        <h3 className='text-xl md:text-2xl mb-3'>
-          {slide.subtitle}
-        </h3>
-      )}
+                {slide.subtitle && (
+                  <h3 className='text-xl md:text-2xl mb-3'>{slide.subtitle}</h3>
+                )}
 
-      {slide.description && (
-        <p className='text-sm md:text-lg mb-6'>
-          {slide.description}
-        </p>
-      )}
+                {slide.description && (
+                  <p className='text-sm md:text-lg mb-6'>{slide.description}</p>
+                )}
 
-      {slide.buttonText && slide.buttonLink && (
-        <a
-          href={slide.buttonLink}
-          target={slide.openInNewTab ? '_blank' : '_self'}
-          className='inline-block bg-amber-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-amber-600 transition'
-        >
-          {slide.buttonText}
-        </a>
-      )}
-    </div>
-
-  </div>
-</SwiperSlide>
-
+                {slide.buttonText && slide.buttonLink && (
+                  <a
+                    href={slide.buttonLink}
+                    target={slide.openInNewTab ? '_blank' : '_self'}
+                    className='inline-block bg-amber-500 text-black px-6 py-3 rounded-lg font-semibold hover:bg-amber-600 transition'
+                  >
+                    {slide.buttonText}
+                  </a>
+                )}
+              </div>
+            </div>
+          </SwiperSlide>
         ))}
       </Swiper>
       {slider.showNavigation && (

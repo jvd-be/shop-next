@@ -6,6 +6,10 @@ export default async function Customfetch (url, options = {}) {
     credentials: 'include'
   })
 
+  if (response.status === 403) {
+    window.location.href = '/signup'
+    return response
+  }
   if (response.status !== 401) {
     return response
   }
@@ -22,9 +26,13 @@ export default async function Customfetch (url, options = {}) {
 
     const refreshResponse = await refreshPromise
 
+    if (refreshResponse.status === 403) {
+      window.location.href = '/signup'
+      return refreshResponse
+    }
     if (!refreshResponse.ok) {
       setTimeout(() => {
-        window.location.href = '/login'
+        window.location.href = '/signup'
       }, 4000)
       return response
     }

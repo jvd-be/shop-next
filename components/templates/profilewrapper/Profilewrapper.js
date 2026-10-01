@@ -4,7 +4,6 @@ import Customfetch from '@/components/utils/CustomeFetch'
 import Sidebaritem from '@/components/modules/profile/sidebarItem/SidebarItem'
 import TicketsSection from '@/components/modules/profile/ticketsection/Ticketsection'
 import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import {
   FiShoppingBag,
   FiHeart,
@@ -24,6 +23,8 @@ import { UseNotification } from '@/components/hooks/UseNotification'
 import Cardnotification from '@/components/modules/cardnotification/Cardnotification'
 import { HiOutlineExclamation } from 'react-icons/hi'
 import Deletemodal from '@/components/modules/cart/deletemodal/Deletemodal'
+import { useDevice } from '@/components/utils/helper'
+import { useHeight } from '@/components/utils/navHeightContext'
 
 const Profilewrapper = ({
   user,
@@ -32,7 +33,6 @@ const Profilewrapper = ({
   ticketsData,
   popups
 }) => {
-  const router = useRouter()
   const { notification, showNotification } = UseNotification()
   const [activeTab, setActiveTab] = useState('orders')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -51,6 +51,9 @@ const Profilewrapper = ({
     category: categoryTicket?.[0]?._id || '',
     message: ''
   })
+
+  const isMobile = useDevice()
+  const { mobileNavHeight, desktopNavHeight } = useHeight()
 
   useEffect(() => {
     if (isMobileMenuOpen) {
@@ -339,7 +342,10 @@ const Profilewrapper = ({
 
   return (
     <div
-      className='min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-vazir'
+      style={{
+        marginTop: `${isMobile ? mobileNavHeight : desktopNavHeight}px`
+      }}
+      className='min-h-screen  bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-vazir'
       dir='rtl'
     >
       <Cardnotification

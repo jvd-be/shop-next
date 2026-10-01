@@ -9,6 +9,7 @@ import Footer from '@/components/templates/footer/Footer'
 import Menumobile from '@/components/templates/menuMoblie/Menumobile'
 import Headermobile from '@/components/modules/headermobile/Headermobile'
 import Blogpagewrapper from '@/components/templates/blogpagewrapper/Blogpagewrapper'
+import { Getbanners } from '@/components/utils/helperServer'
 
 async function getPageData (slug) {
   await ConnectToDB()
@@ -312,7 +313,8 @@ export default async function Blog ({ params }) {
     breadcrumbSchema,
     articleSchema
   ]
-
+  const banners = await Getbanners()
+  const logo = JSON.parse(JSON.stringify(general))
   return (
     <>
       <script
@@ -325,7 +327,7 @@ export default async function Blog ({ params }) {
       <div className='flex min-h-screen flex-col'>
         <Navbar />
 
-        <Headermobile />
+        <Headermobile logo={logo} banners={banners} />
 
         <Menumobile />
 

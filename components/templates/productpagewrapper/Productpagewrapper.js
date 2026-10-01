@@ -12,13 +12,15 @@ import Selectsize from '@/components/modules/selectsize/Selectsize'
 import Quickinfo from '@/components/modules/quickinfo/Quickinfo'
 import Pricewidget from '@/components/modules/pricewdget/Pricewidget'
 import Quantity from '@/components/modules/quantity/Quantity'
-import Cartnotification from '@/components/modules/cardnotification/Cardnotification'
 import Addwishlistheaderdesktop from '@/components/modules/addwishlistheaderdesktop/Addwishlistheaderdesktop'
 import Btnaddtocart from '@/components/modules/btnaddtocart/Btnaddtocart'
 import { UseNotification } from '@/components/hooks/UseNotification'
 import { FiCheck } from 'react-icons/fi'
 import { HiOutlineExclamation } from 'react-icons/hi'
 import { useCart } from '@/components/utils/CartContext'
+import Cardnotification from '@/components/modules/cardnotification/Cardnotification'
+import { useDevice } from '@/components/utils/helper'
+import { useHeight } from '@/components/utils/navHeightContext'
 
 const sizeGuide = {
   header: ['سایز', 'دور سینه', 'قد لباس', 'دور کمر'],
@@ -31,8 +33,17 @@ const sizeGuide = {
   ]
 }
 
-export default function Productpagewrapper ({ product, isWishListed, user,review }) {
+export default function Productpagewrapper ({
+  product,
+  isWishListed,
+  user,
+  review
+}) {
   const categoryName = product?.category?.name || 'بدون دسته‌بندی'
+  const categorySlug = product?.category?.slug
+  const parentCategoryName = product?.category?.parent?.name
+  const parentCategorySlug = product?.category?.parent?.slug
+  console.log(product)
 
   const { showNotification, notification } = UseNotification()
 
@@ -44,13 +55,11 @@ export default function Productpagewrapper ({ product, isWishListed, user,review
 
   const [showSizeGuide, setShowSizeGuide] = useState(false)
 
-  const [showCartNotification, setShowCartNotification] = useState(false)
-
   const [isAddedToCart, setIsAddedToCart] = useState(false)
 
   const [sizeError, setSizeError] = useState(false)
 
-  const [reviews, setReviews] = useState(review|| [])
+  const [reviews, setReviews] = useState(review || [])
 
   const [isWishlist, setIsWishlist] = useState(
     Array.isArray(isWishListed)
@@ -59,9 +68,7 @@ export default function Productpagewrapper ({ product, isWishListed, user,review
   )
 
   // فقط variant های موجود
-  const availableVariants = useMemo(() => {
-    return product?.variants?.filter(variant => variant.quantity > 0) || []
-  }, [product?.variants])
+  const availableVariants = product?.variants
 
   // رنگ‌های موجود
   const colors = useMemo(() => {
@@ -71,7 +78,8 @@ export default function Productpagewrapper ({ product, isWishListed, user,review
           variant.color,
           {
             color: variant.color,
-            colorName: variant.colorName
+            colorName: variant.colorName,
+            quantity: variant.quantity
           }
         ])
       ).values()
@@ -222,14 +230,7 @@ export default function Productpagewrapper ({ product, isWishListed, user,review
 
   return (
     <div className='min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors'>
-      <Cartnotification
-        show={showCartNotification}
-        title='محصول به سبد خرید اضافه شد!'
-        Icon={FaCheck}
-        color='bg-green-500'
-      />
-
-      <Cartnotification
+      <Cardnotification
         title={notification.title}
         color={notification.type === 'success' ? 'bg-green-600' : 'bg-red-600'}
         Icon={notification.type === 'success' ? FiCheck : HiOutlineExclamation}
@@ -243,11 +244,20 @@ export default function Productpagewrapper ({ product, isWishListed, user,review
       <Mobileheader
         isWishlist={isWishlist}
         addToWishList={addToWishList}
+        parentCategoryName={parentCategoryName}
+        categoryName={categoryName}
+        parentCategorySlug={parentCategorySlug}
+        categorySlug={categorySlug}
         name={product.title}
-        category={categoryName}
       />
 
-      <Desktopheader name={product.title} category={categoryName} />
+      <Desktopheader
+        name={product.title}
+        parentCategoryName={parentCategoryName}
+        categoryName={categoryName}
+        parentCategorySlug={parentCategorySlug}
+        categorySlug={categorySlug}
+      />
 
       <main className='max-w-7xl mx-auto px-4 py-4 lg:py-8'>
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12'>

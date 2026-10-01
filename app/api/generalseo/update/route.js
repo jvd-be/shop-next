@@ -72,9 +72,10 @@ export async function PUT(req) {
       )
     }
 
-    if (auth.user?.role !== 'ADMIN') {
+ 
+    if ( auth.user?.role !== 'SUPER_ADMIN' ) {
       return NextResponse.json(
-        { ok: false, message: 'دسترسی غیرمجاز' },
+        { message: 'دسترسی غیر مجاز' },
         { status: 403 }
       )
     }

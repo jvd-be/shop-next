@@ -4,11 +4,16 @@ import GeneralModel from '@/model/GeneralModel'
 import ConnectToDB from '@/app/lib/mongodb'
 import ProductModel from '@/model/ProductModel'
 import Blogmodel from '@/model/Blogmodel'
+import Categorymodel from '@/model/Categorymodel'
+import { Getbanners } from '@/components/utils/helperServer'
+
 export default async function Navbar () {
   const auth = await getAuthFromCookies()
   let logoData = null
   let blogs = null
   let products = null
+  let categoriesData = null
+  const banners = await Getbanners()
   try {
     await ConnectToDB()
     logoData = await GeneralModel.findOne(
@@ -16,7 +21,14 @@ export default async function Navbar () {
       { siteLogo: 1, siteName: 1 }
     ).lean()
     blogs = await Blogmodel.find({ isActive: true }).lean()
-    let productsRow = await ProductModel.find({}).lean()
+    categoriesData = await Categorymodel.find({
+      isActive: true
+    })
+      .populate('parent', 'name slug')
+      .sort({ order: 1 })
+      .lean()
+    let productsRow = await ProductModel.find({})
+      .lean()
       .populate('category', 'name')
       .lean()
     products = productsRow.map(item => ({
@@ -29,13 +41,17 @@ export default async function Navbar () {
   const logo = JSON.parse(JSON.stringify(logoData))
   let initialblogs = JSON.parse(JSON.stringify(blogs))
   let initialproducts = JSON.parse(JSON.stringify(products))
+  let categories = JSON.parse(JSON.stringify(categoriesData))
+
   return (
     <div>
       <Navbarwrapper
+        banners={banners}
         auth={auth}
         logo={logo}
         initialblogs={initialblogs}
         initialproducts={initialproducts}
+        categories={categories}
       />
     </div>
   )

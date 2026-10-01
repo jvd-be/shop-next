@@ -1,5 +1,5 @@
-export default function Pricewidget ({price,oldPrice,discount}) {
-    const formatPrice = price => {
+export default function Pricewidget ({ price, oldPrice, discount }) {
+  const formatPrice = price => {
     return new Intl.NumberFormat('fa-IR').format(price)
   }
 
@@ -11,7 +11,8 @@ export default function Pricewidget ({price,oldPrice,discount}) {
         </span>
         <span className='text-gray-500 dark:text-gray-400'>تومان</span>
       </div>
-      {oldPrice && (
+
+      {oldPrice > price && (
         <div className='flex items-center gap-3 mt-1'>
           <span className='text-gray-400 dark:text-gray-500 line-through text-lg'>
             {formatPrice(oldPrice)}

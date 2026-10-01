@@ -3,16 +3,13 @@ import DiscountPopup from "@/components/modules/popups/discountpopup/Discountpop
 export default function Popups ({ popups, popupKey }) {
 
 const popup = popups.find(item => item.key === popupKey);
-
-    console.log( popups, popupKey );
-    
-    
+  
   if (!popup) return null
 
   switch (popup.key) {
     case 'home':
       return <DiscountPopup popup={popup} />
-    case 'wishlist':
+    case 'cart':
       return <DiscountPopup popup={popup} />
 
     default:

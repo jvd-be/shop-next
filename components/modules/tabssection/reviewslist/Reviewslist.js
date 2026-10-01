@@ -19,7 +19,7 @@ export default function Reviewslist ({ reviews }) {
               <Avatar user={review.user} size={40} />
               <div>
                 <p className='font-medium text-gray-900 dark:text-white text-sm'>
-                  {review.user.name}
+                  {review?.user?.name}
                 </p>
                 <p className='text-xs text-gray-500 dark:text-gray-400'>
                   {review.date}

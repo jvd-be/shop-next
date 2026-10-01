@@ -31,9 +31,10 @@ export async function DELETE(req) {
       )
     }
 
-    if (auth.user?.role !== 'ADMIN') {
+  
+    if (auth.user?.role !== 'ADMIN' &&  auth.user?.role !== 'SUPER_ADMIN' ) {
       return NextResponse.json(
-        { success: false, message: 'دسترسی غیر مجاز' },
+        { message: 'دسترسی غیر مجاز' },
         { status: 403 }
       )
     }

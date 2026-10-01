@@ -4,8 +4,25 @@ import Blogmodel from '@/model/Blogmodel'
 import path from 'path'
 import { writeFile, mkdir } from 'fs/promises'
 import { randomUUID } from 'crypto'
+import { getAuthFromCookies } from '@/components/utils/authServer'
 
 export async function POST (req) {
+    const auth = await getAuthFromCookies()
+  
+      if (!auth?.isLoggedIn) {
+        return NextResponse.json(
+          { message: "ابتدا وارد شوید" },
+          { status: 401 }
+        )
+      }
+  
+     
+      if (auth.user?.role !== 'ADMIN' &&  auth.user?.role !== 'SUPER_ADMIN' ) {
+        return NextResponse.json(
+          { message: 'دسترسی غیر مجاز' },
+          { status: 403 }
+        )
+      }
   await ConnectToDB()
 
   try {

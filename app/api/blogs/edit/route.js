@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import path from 'path'
 import { writeFile, mkdir, unlink } from 'fs/promises'
 import { randomUUID } from 'crypto'
+import { getAuthFromCookies } from '@/components/utils/authServer'
 
 function publicPathToFilePath(fileUrl) {
   if (!fileUrl || typeof fileUrl !== 'string') return null
@@ -22,6 +23,22 @@ async function removeFile(fileUrl) {
 }
 
 export async function PUT(req) {
+    const auth = await getAuthFromCookies()
+  
+      if (!auth?.isLoggedIn) {
+        return NextResponse.json(
+          { message: "ابتدا وارد شوید" },
+          { status: 401 }
+        )
+      }
+  
+     
+      if (auth.user?.role !== 'ADMIN' &&  auth.user?.role !== 'SUPER_ADMIN' ) {
+        return NextResponse.json(
+          { message: 'دسترسی غیر مجاز' },
+          { status: 403 }
+        )
+      }
   await ConnectToDB()
 
   try {
