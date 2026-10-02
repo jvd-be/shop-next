@@ -351,7 +351,7 @@ const addSlider = async formData => {
       body: JSON.stringify({
         mobilePhone: contactData.mobilePhone,
         email: contactData.email,
-        storePhone: contactData.storePhone
+        storePhone: contactData?.storePhone
       })
     })
 

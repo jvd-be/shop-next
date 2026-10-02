@@ -38,11 +38,10 @@ export default async function Navbar () {
       updatedAt: item?.updatedAt?.toISOString()
     }))
   } catch (error) {}
-  const logo = JSON.parse(JSON.stringify(logoData))
-  let initialblogs = JSON.parse(JSON.stringify(blogs))
-  let initialproducts = JSON.parse(JSON.stringify(products))
-  let categories = JSON.parse(JSON.stringify(categoriesData))
-
+const logo = logoData ? JSON.parse(JSON.stringify(logoData)) : null
+const initialblogs = blogs ? JSON.parse(JSON.stringify(blogs)) : []
+const initialproducts = products ? JSON.parse(JSON.stringify(products)) : []
+const categories = categoriesData ? JSON.parse(JSON.stringify(categoriesData)) : []
   return (
     <div>
       <Navbarwrapper

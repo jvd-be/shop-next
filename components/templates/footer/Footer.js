@@ -70,7 +70,7 @@ const Footer = async () => {
                 درباره ما
               </Link>
               <Link href='/aboutus' className='hover:text-cyan-400'>
-               شرایط بازگشت
+                شرایط بازگشت
               </Link>
             </div>
           </div>
@@ -81,29 +81,29 @@ const Footer = async () => {
               اطلاعات تماس
             </h2>
 
-        {contacts?.storePhone && (
-  <p>
-    📞 تلفن فروشگاه:
-    <a
-      href={`tel:${contacts?.storePhone}`}
-      className="mr-1 text-cyan-400 hover:underline"
-    >
-      {contacts?.storePhone}
-    </a>
-  </p>
-)}
+            {contacts?.storePhone && (
+              <p>
+                📞 تلفن فروشگاه:
+                <a
+                  href={`tel:${contacts?.storePhone}`}
+                  className='mr-1 text-cyan-400 hover:underline'
+                >
+                  {contacts?.storePhone}
+                </a>
+              </p>
+            )}
 
-{contacts?.mobilePhone && (
-  <p>
-    📱 موبایل:
-    <a
-      href={`tel:${contacts?.mobilePhone}`}
-      className="mr-1 text-cyan-400 hover:underline"
-    >
-      {contacts?.mobilePhone}
-    </a>
-  </p>
-)}
+            {contacts?.mobilePhone && (
+              <p>
+                📱 موبایل:
+                <a
+                  href={`tel:${contacts?.mobilePhone}`}
+                  className='mr-1 text-cyan-400 hover:underline'
+                >
+                  {contacts?.mobilePhone}
+                </a>
+              </p>
+            )}
             {/* socials */}
             {socialLinks?.length > 0 && (
               <div className='mt-8'>

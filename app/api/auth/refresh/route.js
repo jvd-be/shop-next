@@ -57,7 +57,8 @@ export async function POST (req) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 1
+      path: '/',
+      maxAge: 60 * 60
     })
     return response
   } catch (error) {

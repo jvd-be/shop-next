@@ -34,8 +34,8 @@ export default async function Home () {
       parent: null
     }).lean()
   } catch (error) {}
-  const logo = JSON.parse(JSON.stringify(logoData))
-  const category = JSON.parse(JSON.stringify(categoryData))
+const logo = logoData ? JSON.parse(JSON.stringify(logoData)) : null
+const category = categoryData ? JSON.parse(JSON.stringify(categoryData)) : []
   const banners = await Getbanners()
 
   
